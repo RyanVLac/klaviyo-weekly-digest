@@ -52,14 +52,14 @@ export default function DemoPage() {
       return;
     }
 
-    setStatus(`✅ Tracked "${title}" (queued in Klaviyo)`);
+    setStatus(`Tracked "${title}" (queued in Klaviyo)`);
   }
 
   return (
     <main style={{ padding: 24, maxWidth: 900 }}>
       <h1 style={{ marginBottom: 6 }}>Demo Browse</h1>
       <p style={{ marginTop: 0 }}>
-        Click categories/products — we’ll send <b>Page Viewed</b> and <b>Product Viewed</b> events into Klaviyo.
+        Click categories/products we’ll send <b>Page Viewed</b> and <b>Product Viewed</b> events into Klaviyo.
       </p>
 
       <div style={{ marginBottom: 16, padding: 12, border: "1px solid #ddd" }}>

@@ -25,7 +25,7 @@ export default function DemoCategoryPage() {
         dwellSeconds: 15,
       }),
     })
-      .then(() => setStatus(`✅ Auto-tracked Page Viewed: ${category}`))
+      .then(() => setStatus(`Auto-tracked Page Viewed: ${category}`))
       .catch(() => setStatus("Failed to track."));
   }, [category]);
 
