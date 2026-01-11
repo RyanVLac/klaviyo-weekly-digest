@@ -24,6 +24,26 @@ export type WeeklyDigest = {
   narrative: string;
 };
 
+function inferTopicFromSignals(props: Record<string, any>): string {
+  const direct = typeof props?.topic === "string" ? props.topic.trim() : "";
+  if (direct) return direct;
+
+  const url = String(props?.url_path ?? "").toLowerCase();
+  const title = String(props?.title ?? "").toLowerCase();
+  const productName = String(props?.product_name ?? "").toLowerCase();
+  const productId = String(props?.product_id ?? "").toLowerCase();
+
+  const hay = `${url} ${title} ${productName} ${productId}`;
+
+  if (hay.includes("boot")) return "boots";
+  if (hay.includes("jacket") || hay.includes("puffer") || hay.includes("rain")) return "jackets";
+  if (hay.includes("snow") || hay.includes("glove") || hay.includes("thermal") || hay.includes("base layer")) return "snow";
+  if (hay.includes("run") || hay.includes("running") || hay.includes("shoe")) return "running";
+
+  return "unknown";
+}
+
+
 function safeNum(v: any): number | null {
   const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
   return Number.isFinite(n) ? n : null;
@@ -56,7 +76,7 @@ export function buildWeeklyDigest(opts: {
   >();
 
   for (const e of used) {
-    const topic = typeof e.properties?.topic === "string" ? e.properties.topic : "unknown";
+    const topic = inferTopicFromSignals(e.properties);
 
     const curTopic = topicAgg.get(topic) ?? { pageViews: 0, productViews: 0, dwellSeconds: 0 };
 
@@ -103,6 +123,7 @@ export function buildWeeklyDigest(opts: {
   }
 
   const topTopics = Array.from(topicAgg.entries())
+    .filter(([topic]) => topic !== "unknown")
     .map(([topic, v]) => {
       // Simple scoring: product views weighted higher than page views + dwell time
       const score = v.productViews * 3 + v.pageViews * 1 + Math.min(v.dwellSeconds / 10, 20);

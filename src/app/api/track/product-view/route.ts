@@ -7,36 +7,33 @@ export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => null);
 
-    const emailRaw = body?.email;
-    const email =
-      typeof emailRaw === "string" ? emailRaw.trim().toLowerCase() : "";
-
+    const email = body?.email?.trim();
     const productId = body?.productId ?? null;
     const productName = body?.productName ?? null;
     const price = body?.price ?? null;
     const urlPath = body?.urlPath ?? null;
 
-    if (!email) {
-      return NextResponse.json({ ok: false, error: "Missing email" }, { status: 400 });
+    // NEW:
+    const topic = typeof body?.topic === "string" && body.topic.trim() ? body.topic.trim() : "uncategorized";
+
+    if (!email || typeof email !== "string") {
+      return NextResponse.json({ error: "Missing email" }, { status: 400 });
     }
-    if (!productId || !productName) {
-      return NextResponse.json(
-        { ok: false, error: "Missing productId or productName" },
-        { status: 400 }
-      );
+    if (!productId || typeof productId !== "string") {
+      return NextResponse.json({ error: "Missing productId" }, { status: 400 });
     }
 
     const profileId = await getOrCreateProfileId(email);
 
     const eventId = await createEvent({
       profileId,
-      email,
       metricName: "Product Viewed",
       properties: {
+        topic, 
         product_id: productId,
         product_name: productName,
         price,
-        url_path: urlPath,
+        url_path: urlPath
       },
     });
 
