@@ -11,7 +11,6 @@ export default function DemoCategoryPage() {
   const [status, setStatus] = useState<string>("");
 
   useEffect(() => {
-    // auto-track when you land on the page (nice for demo video)
     const email = getSavedEmail();
     if (!email) return;
 
