@@ -1,20 +1,9 @@
 import "dotenv/config";
-import { config } from "../src/lib/config";
+import { klaviyoFetchJson } from "../src/lib/klaviyo/client";
 
 async function main() {
-  const res = await fetch(`${config.klaviyoApiBase}/profiles?page[size]=1`, {
-    headers: {
-      Authorization: `Klaviyo-API-Key ${config.klaviyoPrivateKey}`,
-      revision: config.klaviyoRevision,
-      Accept: "application/json"
-    }
-  });
-
-  const text = await res.text();
-  console.log("Status:", res.status);
-  console.log(text);
-
-  if (!res.ok) process.exit(1);
+  const data = await klaviyoFetchJson<any>("/profiles?page[size]=1");
+  console.log(JSON.stringify(data, null, 2));
 }
 
 main().catch((e) => {
