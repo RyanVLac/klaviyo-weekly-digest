@@ -1,0 +1,36 @@
+{
+  "name": "klaviyo-weekly-digest",
+  "version": "1.0.0",
+  "description": "Klaviyo Weekly Digest: An AI-powered app that combats promo overload by tracking user engagements with content/products via Klaviyo APIs, aggregating interests, and sending personalized weekly email summaries. Built for the Klaviyo Winter 2026 Hackathon Challenge.",
+  "scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RyanVLac/klaviyo-weekly-digest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/RyanVLac/klaviyo-weekly-digest/issues"
+  },
+  "homepage": "https://github.com/RyanVLac/klaviyo-weekly-digest#readme",
+  "dependencies": {
+    "next": "^16.1.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.6",
+    "@types/react": "^19.2.8",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.1.1",
+    "typescript": "^5.9.3"
+  }
+}
