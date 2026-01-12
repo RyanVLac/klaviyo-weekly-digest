@@ -17,14 +17,18 @@
 }
 
 * { box-sizing: border-box; }
-html, body { padding: 0; margin: 0; }
+html, body { padding: 0; margin: 0; height: 100%; }
 
 body {
+  min-height: 100vh;
   background:
     radial-gradient(1200px 600px at 18% 0%, rgba(250, 179, 169, 0.35), transparent 60%),
     radial-gradient(1000px 700px at 82% 18%, rgba(127, 178, 133, 0.22), transparent 60%),
     radial-gradient(900px 650px at 60% 80%, rgba(237, 107, 134, 0.18), transparent 60%),
     var(--bg);
+  background-repeat: no-repeat;
+  background-attachment: fixed, fixed, fixed;
+
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
 }
@@ -43,7 +47,7 @@ a:hover { text-decoration: underline; }
   top: 0;
   z-index: 20;
   backdrop-filter: blur(10px);
-  background: rgba(70, 50, 57, 0.70); /* mauve */
+  background: rgba(70, 50, 57, 0.70);
   border-bottom: 1px solid var(--border);
 }
 
@@ -75,7 +79,6 @@ a:hover { text-decoration: underline; }
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--muted);
-  background: rgba(250, 179, 169, 0.10); /* powder tint */
 }
 
 .navLinks {
@@ -109,8 +112,8 @@ a:hover { text-decoration: underline; }
   width: 100%;
   padding: 10px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(198, 173, 148, 0.45);
-  background: rgba(70, 50, 57, 0.35); /* mauve */
+  border: 1px solid var(--border);
+  background: rgba(70, 50, 57, 0.35);
   color: var(--text);
   outline: none;
 }
@@ -122,23 +125,23 @@ a:hover { text-decoration: underline; }
 .btn {
   padding: 10px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(237, 107, 134, 0.55);
+  border: 1px solid var(--border);
   background: rgba(237, 107, 134, 0.22);
   color: var(--text);
   cursor: pointer;
 }
-.btn:hover { background: rgba(237, 107, 134, 0.32); }
+.btn:hover { background: rgba(198, 173, 148, 0.16); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btnSecondary {
   padding: 10px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(198, 173, 148, 0.45);
-  background: rgba(198, 173, 148, 0.10);
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,0.22);
   color: var(--text);
   cursor: pointer;
 }
-.btnSecondary:hover { background: rgba(198, 173, 148, 0.16); }
+.btnSecondary:hover { background: rgba(255,255,255,0.06); }
 
 .kv {
   display: grid;
@@ -153,14 +156,10 @@ a:hover { text-decoration: underline; }
   gap: 8px;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(198, 173, 148, 0.45);
+  border: 1px solid var(--border);
   background: rgba(70, 50, 57, 0.22);
-  color: rgba(255, 247, 245, 0.78);
+  color: var(--muted);
   font-size: 13px;
 }
 
-hr.sep {
-  border: none;
-  border-top: 1px solid rgba(198, 173, 148, 0.35);
-  margin: 14px 0;
-}
+hr.sep { border: none; border-top: 1px solid rgba(255,255,255,0.10); margin: 14px 0; }

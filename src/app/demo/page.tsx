@@ -1,6 +1,6 @@
 // src/app/demo/page.tsx
 import Link from "next/link";
-import { demoCategories } from "@/lib/demo/catalog";
+import { demoCategories } from "src/lib/demo/catalog";
 import { ActiveEmailBanner, TrackPageViewButton } from "@/components/Trackers";
 
 export default function DemoPage() {
