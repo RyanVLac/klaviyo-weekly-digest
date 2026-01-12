@@ -47,7 +47,7 @@ export default function HomePage() {
       </div>
 
       <div className="card">
-        <div className="h2">What’s dynamic (not hardcoded)</div>
+        <div className="h2">What’s dynamic</div>
         <p className="muted" style={{ marginTop: 8, lineHeight: 1.6 }}>
           The demo store is just a sandbox to generate realistic events.
           The dashboard pulls real events back from Klaviyo, aggregates them into stats/topics/products,
