@@ -16,8 +16,62 @@ This is designed for a short demo: set an email → click around the demo store 
 - **Reading real engagement events back from Klaviyo** (not hardcoded)
 - **Digest aggregation** (topics/products/stats) from those events
 - **AI summarization + topic inference** (OpenAI) to produce a more human-friendly digest
--  A simple UI flow to make the demo easy for judges to follow
+-  A simple UI flow to make the demo easy for people to follow.
 
+---
+
+## The problem you are solving and its impact
+
+Most teams can track user behavior (page views, product views, dwell time), but turning that raw event stream into something **human-readable and actionable** usually takes extra dashboards, manual analysis, or engineering work. In this day in age, there are so much content everywhere, that it can get overwhelming for individuals. My app aims to help consolidate all the your favorite products and events in to one digestable summary at the end of the weak.
+
+**Impact**
+- **Marketers / product teams / consumers**
+- **Personalization** becomes easier: inferred interests + suggested products/topics can drive smarter follow-ups.
+- **Faster iteration**: you can see how engagement changes week-to-week from real event data.
+
+---
+
+## How the solution works
+
+1) **Identity (Signup)**
+- User enters an email on `/signup`
+- The app **upserts a Klaviyo profile** for that email and stores the email locally (localStorage) to simulate a returning user.
+
+2) **Generate events (Demo Store)**
+- `/demo` and its sub-pages simulate a small store experience.
+- When the user opens a category/content/product page, the app sends:
+  - **Page Viewed** events (`/api/track/page-view`)
+  - **Product Viewed** events (`/api/track/product-view`)
+- These events are written into **Klaviyo** via the Klaviyo API.
+
+3) **Digest generation (Dashboard)**
+- On `/dashboard`, clicking **Generate Digest** calls `/api/digest/generate`
+- That endpoint:
+  - Pulls the last **N days** of events from **Klaviyo** for the email’s profile
+  - Aggregates them into a deterministic digest:
+    - totals (page views, product views, dwell time)
+    - top topics
+    - top products
+  - Then optionally runs AI to produce a more natural summary + inferred topics + recommendations.
+
+---
+
+## How you used AI effectively (if at all)
+
+AI is used to **improve and humanize the digest**, not to replace the underlying analytics.
+
+Specifically:
+- **Topic inference:** when events have missing or weak topic labels, the AI infers interests using signals like:
+  - URL path
+  - page title
+  - product name / product id
+- **Natural language digest:** AI produces a clear weekly narrative (“what you spent time on, what stood out”)
+- **Recommendations:** AI returns product suggestions tied to actual browsing evidence (and uses known products when available)
+
+Important: the app still produces a deterministic digest from real Klaviyo events even if AI is disabled.
+
+## How to run locally
+see below
 ---
 
 ## Tech Stack
