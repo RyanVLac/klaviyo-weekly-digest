@@ -1,19 +1,16 @@
-const KEY = "kwd_email";
+const KEY = "kwd_active_email";
 
-export function getSavedEmail(): string | null {
-  if (typeof window === "undefined") return null;
-  const v = window.localStorage.getItem(KEY);
-  if (!v) return null;
-  const email = v.trim().toLowerCase();
-  return email ? email : null;
+export function getActiveEmail(): string {
+  if (typeof window === "undefined") return "";
+  return (localStorage.getItem(KEY) ?? "").trim();
 }
 
-export function saveEmail(email: string) {
+export function setActiveEmail(email: string) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(KEY, email.trim().toLowerCase());
+  localStorage.setItem(KEY, email.trim());
 }
 
-export function clearEmail() {
+export function clearActiveEmail() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(KEY);
+  localStorage.removeItem(KEY);
 }

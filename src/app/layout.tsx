@@ -1,18 +1,18 @@
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 export const metadata = {
   title: "Klaviyo Weekly Digest",
-  description: "Hackathon demo app"
+  description: "AI-powered weekly digest from Klaviyo engagement events (demo).",
 };
 
-export default function RootLayout({
-  children
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        <div className="container">{children}</div>
+      </body>
     </html>
   );
 }

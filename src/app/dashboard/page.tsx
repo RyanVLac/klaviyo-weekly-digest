@@ -1,119 +1,163 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { getActiveEmail, setActiveEmail } from "@/lib/client/user";
+import DigestPreview from "@/components/DigestPreview";
+import EventDebugTable from "@/components/EventDebugTable";
 
-type DigestResponse = {
-  ok: boolean;
-  error?: string;
-  email?: string;
-  profileId?: string;
-  digest?: any;
-  meta?: { fetchedEvents: number };
-  klaviyoStatus?: number;
-  klaviyoBody?: string;
-};
+type DigestResponse = any;
 
 export default function DashboardPage() {
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [days, setDays] = useState(7);
+  const [busy, setBusy] = useState(false);
   const [resp, setResp] = useState<DigestResponse | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem("kwd_email") || "";
-    setEmail(saved);
+    const e = getActiveEmail();
+    if (e) setEmail(e);
   }, []);
 
-  const hasEmail = useMemo(() => !!email.trim(), [email]);
-
   async function generate() {
-    if (!hasEmail) return;
+    const v = email.trim().toLowerCase();
+    if (!v.includes("@")) {
+      setErr("Set a valid email first (Signup).");
+      return;
+    }
 
-    setLoading(true);
-    setResp(null);
+    setBusy(true);
+    setErr(null);
 
     try {
+      setActiveEmail(v);
+
       const r = await fetch("/api/digest/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, days: 7 }),
+        body: JSON.stringify({ email: v, days }),
       });
 
-      const data = (await r.json()) as DigestResponse;
-      setResp(data);
+      const j = await r.json().catch(() => null);
+      if (!r.ok) {
+        setErr(j?.error ?? `Failed (${r.status})`);
+        return;
+      }
+
+      setResp(j);
     } catch (e) {
-      setResp({ ok: false, error: e instanceof Error ? e.message : "Unknown error" });
+      setErr(e instanceof Error ? e.message : "Unknown error");
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
   }
 
-  return (
-    <main style={{ padding: 24, maxWidth: 900 }}>
-      <h1>Klaviyo Weekly Digest — Dashboard</h1>
+  async function simulateActivity() {
+    const v = email.trim().toLowerCase();
+    if (!v.includes("@")) {
+      setErr("Set a valid email first (Signup).");
+      return;
+    }
+    setErr(null);
+    setBusy(true);
 
-      <p>
-        This pulls your last 7 days of <b>Page Viewed</b> + <b>Product Viewed</b> events from Klaviyo,
-        then generates a digest.
-      </p>
+    try {
+      setActiveEmail(v);
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 12 }}>
-        <input
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            window.localStorage.setItem("kwd_email", e.target.value);
-          }}
-          placeholder="you@example.com"
-          style={{ width: 380, padding: 10 }}
-        />
-        <button disabled={!hasEmail || loading} onClick={generate} style={{ padding: "10px 14px" }}>
-          {loading ? "Generating..." : "Generate Digest"}
-        </button>
+      const posts = [
+        { url: "/api/track/page-view", body: { email: v, urlPath: "/demo", title: "Demo Store", topic: "boots", dwellSeconds: 10 } },
+        { url: "/api/track/page-view", body: { email: v, urlPath: "/demo/content/winter-running-tips", title: "Winter running tips", topic: "running", dwellSeconds: 20 } },
+        { url: "/api/track/page-view", body: { email: v, urlPath: "/demo/content/jacket-fit-and-features", title: "Jacket fit & features", topic: "jackets", dwellSeconds: 18 } },
+        { url: "/api/track/product-view", body: { email: v, productId: "boot-001", productName: "Classic Leather Boot", price: 129.99, urlPath: "/demo/products/boot-001", title: "Classic Leather Boot", topic: "boots" } },
+        { url: "/api/track/product-view", body: { email: v, productId: "jackets-001", productName: "Puffer Rain Jacket", price: 159.99, urlPath: "/demo/products/jackets-001", title: "Puffer Rain Jacket", topic: "jackets" } },
+        { url: "/api/track/page-view", body: { email: v, urlPath: "/demo/content/layering-for-snow-days", title: "Layering guide for snow days", topic: "snow", dwellSeconds: 16 } },
+      ];
+
+      for (const p of posts) {
+        const r = await fetch(p.url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(p.body),
+        });
+
+        if (!r.ok) {
+          const j = await r.json().catch(() => null);
+          throw new Error(j?.error ?? `Simulate failed (${r.status})`);
+        }
+      }
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Unknown error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+    return (
+    <div className="stack">
+      {/* Top controls card */}
+      <div className="card">
+        <h1 className="h1">Dashboard</h1>
+        <p className="muted" style={{ marginTop: 10 }}>
+          Pull events from Klaviyo → build digest → generate AI summary.
+        </p>
+
+        <hr className="sep" />
+
+        <div className="row">
+          <div style={{ flex: 1, minWidth: 240 }}>
+            <div className="muted" style={{ marginBottom: 6 }}>Email</div>
+            <input
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+            />
+          </div>
+
+          <div style={{ width: 140 }}>
+            <div className="muted" style={{ marginBottom: 6 }}>Days</div>
+            <input
+              className="input"
+              type="number"
+              min={1}
+              max={30}
+              value={days}
+              onChange={(e) => setDays(Number(e.target.value))}
+            />
+          </div>
+
+          <button className="btn" onClick={generate} disabled={busy}>
+            {busy ? "Working..." : "Generate Digest"}
+          </button>
+
+          <button className="btnSecondary" onClick={simulateActivity} disabled={busy}>
+            Simulate Activity
+          </button>
+        </div>
+
+        {err ? <p className="muted" style={{ marginTop: 10 }}>{err}</p> : null}
+
+        <p className="muted" style={{ marginTop: 10 }}>
+          Tip: You can also generate events by browsing <b>/demo</b> naturally.
+        </p>
       </div>
 
-      {!hasEmail && (
-        <p style={{ marginTop: 10 }}>
-          No email saved yet — go to <a href="/signup">/signup</a> first or type one above.
+      {/* Digest section UNDER the dashboard */}
+      <DigestPreview
+        digest={resp?.digest ?? null}
+        aiDigest={resp?.aiDigest ?? null}
+        aiUsed={Boolean(resp?.aiUsed)}
+      />
+
+      {/* Debug table also under */}
+      <div className="card">
+        <div className="h2">Raw Events (debug)</div>
+        <p className="muted" style={{ marginTop: 8 }}>
+          This is only for development/debug during the hackathon.
         </p>
-      )}
-
-      {resp && (
-        <section style={{ marginTop: 18 }}>
-          {!resp.ok ? (
-            <>
-              <h2 style={{ color: "crimson" }}>Error</h2>
-              <pre style={{ whiteSpace: "pre-wrap" }}>
-                {JSON.stringify(resp, null, 2)}
-              </pre>
-              <p>
-                If you just tracked events, Klaviyo may take a moment to make them available via GET.
-                Try again in ~20–60 seconds.
-              </p>
-            </>
-          ) : (
-            <>
-              <h2>Digest</h2>
-              <p>
-                <b>Email:</b> {resp.email} <br />
-                <b>Profile:</b> {resp.profileId} <br />
-                <b>Fetched events:</b> {resp.meta?.fetchedEvents ?? "?"}
-              </p>
-
-              <h3>Summary</h3>
-              <p>{resp.digest?.narrative}</p>
-
-              <h3>Stats</h3>
-              <pre>{JSON.stringify(resp.digest?.stats, null, 2)}</pre>
-
-              <h3>Top Topics</h3>
-              <pre>{JSON.stringify(resp.digest?.topTopics, null, 2)}</pre>
-
-              <h3>Top Products</h3>
-              <pre>{JSON.stringify(resp.digest?.topProducts, null, 2)}</pre>
-            </>
-          )}
-        </section>
-      )}
-    </main>
+        <hr className="sep" />
+        <EventDebugTable events={resp?.normalizedEvents ?? []} />
+      </div>
+    </div>
   );
 }

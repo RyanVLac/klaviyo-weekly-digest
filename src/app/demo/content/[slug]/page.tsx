@@ -1,49 +1,46 @@
-"use client";
-
+// src/app/demo/content/[slug]/page.tsx
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { getSavedEmail } from "@/lib/client/user";
+import { notFound } from "next/navigation";
+import { findDemoContent } from "@/lib/demo/catalog";
+import { AutoTrackPageView } from "@/components/Trackers";
 
-export default function DemoCategoryPage() {
-  const params = useParams();
-  const category = (params?.category as string) || "category";
-  const [status, setStatus] = useState<string>("");
+export default async function ContentPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
 
-  useEffect(() => {
-    const email = getSavedEmail();
-    if (!email) return;
-
-    fetch("/api/track/page-view", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        urlPath: `/demo/${category}`,
-        title: `${category} Category`,
-        topic: category,
-        dwellSeconds: 15,
-      }),
-    })
-      .then(() => setStatus(`Auto-tracked Page Viewed: ${category}`))
-      .catch(() => setStatus("Failed to track."));
-  }, [category]);
+  const post = findDemoContent(slug);
+  if (!post) return notFound();
 
   return (
-    <main style={{ padding: 24 }}>
-      <p><Link href="/demo">← Back to Demo</Link></p>
-      <h1 style={{ marginBottom: 6 }}>{category} category</h1>
-      <p style={{ marginTop: 0, opacity: 0.85 }}>
-        This page auto-sends a <b>Page Viewed</b> event on load.
-      </p>
+    <main>
+      <AutoTrackPageView title={post.title} topic={post.topic} dwellSeconds={12} />
 
-      {status ? <div style={{ padding: 12, border: "1px solid #ddd" }}>{status}</div> : null}
+      <div className="card">
+        <Link className="btnSecondary" href="/demo">
+          ← Back to Demo Store
+        </Link>
 
-      <h2 style={{ marginTop: 20 }}>Products</h2>
-      <ul>
-        <li><Link href={`/demo/product/${category}-001`}>{category}-001</Link></li>
-        <li><Link href={`/demo/product/${category}-002`}>{category}-002</Link></li>
-      </ul>
+        <h1 className="h1" style={{ marginTop: 12 }}>
+          {post.title}
+        </h1>
+
+        <div className="row" style={{ marginTop: 10 }}>
+          <span className="tag">Topic: {post.topic}</span>
+        </div>
+
+        <p className="muted" style={{ marginTop: 12 }}>
+          {post.excerpt}
+        </p>
+
+        <img
+          src="/demo/placeholder-article.png"
+          alt="article"
+          style={{ width: "100%", maxWidth: 720, marginTop: 14, borderRadius: 10 }}
+        />
+      </div>
     </main>
   );
 }
