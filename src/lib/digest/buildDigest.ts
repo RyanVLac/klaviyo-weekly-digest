@@ -29,16 +29,10 @@ function inferTopicFromSignals(props: Record<string, any>): string {
   if (direct) return direct;
 
   const url = String(props?.url_path ?? "").toLowerCase();
-  const title = String(props?.title ?? "").toLowerCase();
-  const productName = String(props?.product_name ?? "").toLowerCase();
-  const productId = String(props?.product_id ?? "").toLowerCase();
 
-  const hay = `${url} ${title} ${productName} ${productId}`;
-
-  if (hay.includes("boot")) return "boots";
-  if (hay.includes("jacket") || hay.includes("puffer") || hay.includes("rain")) return "jackets";
-  if (hay.includes("snow") || hay.includes("glove") || hay.includes("thermal") || hay.includes("base layer")) return "snow";
-  if (hay.includes("run") || hay.includes("running") || hay.includes("shoe")) return "running";
+  // Example: /demo/boots or /category/boots -> boots
+  const match = url.match(/\/(demo|category|collections?)\/([^\/\?\#]+)/);
+  if (match?.[2]) return match[2].replace(/[-_]/g, " ").trim();
 
   return "unknown";
 }

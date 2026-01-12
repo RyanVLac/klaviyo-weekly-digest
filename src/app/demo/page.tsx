@@ -8,7 +8,7 @@ export default function DemoPage() {
     <main>
       <h1 className="h1">Demo Browse</h1>
       <p className="muted">
-        Click categories/products — we’ll send <b>Page Viewed</b> and <b>Product Viewed</b> events into
+        Click categories/products : we’ll send <b>Page Viewed</b> and <b>Product Viewed</b> events into
         Klaviyo.
       </p>
 
