@@ -256,5 +256,3 @@ I also have alot catch blocks through the code to ensure errors are caught. Furt
 
 ## Video Link
 https://youtu.be/ZVeO8NLFoPI
-
-
